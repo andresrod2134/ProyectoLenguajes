@@ -11,7 +11,7 @@ data Component
   | aOperator(str opName, list[str] types, list[AttrElement] attrs)
   | aExpression(Expr exprBody)
   | aEquation(Expr eqLhs, str eqOp, Expr eqRhs)
-  | aRelation(Expr relLhs, str relOp, Expr relRhs)
+  | aRelation(Expr relLhs, RelOp relOp, Expr relRhs)
   | aRule(OpApp ruleLhs, OpApp ruleRhs)
   ;
 
@@ -22,6 +22,10 @@ data AttrElement
   | apair(str name, str val)
   ;
 
+data Quantifier = aForall() | aExists() | aDefer();
+
+data RelOp = aLt() | aGt() | aLte() | aGte() | aNeq() | aRin();
+
 data Expr
   = id(str name)
   | parens(Expr expr)
@@ -31,7 +35,7 @@ data Expr
   | andOp(Expr lhs, Expr rhs)
   | equivOp(Expr lhs, Expr rhs)
   | binaryOp(Expr lhs, str op, Expr rhs)
-  | quant(str quantifier, str var, str domain, Expr body)
+  | quant(Quantifier quantifier, str var, str domain, Expr body)
   ;
 
 data OpApp = opApp(str name, list[Arg] args);
