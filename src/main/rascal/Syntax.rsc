@@ -2,11 +2,18 @@ module Syntax
 
 keyword Reserved = "defmodule" | "end" | "using" | "defspace" | "defoperator" 
                  | "defexpression" | "in" | "forall" | "exists" | "defer" 
-                 | "and" | "or" | "neg" | "defrule" | "defvar";
+                 | "and" | "or" | "neg" | "defrule" | "defvar"
+                 | "true" | "false" | "Int" | "Bool" | "Char" | "String"; // NUEVO: palabras reservadas para tipos y literales
 
 lexical Identifier = ([a-zA-Z][a-zA-Z0-9_\-]*) \ Reserved !>> [a-zA-Z0-9_\-]; 
 lexical EmptySet = "∅";
 lexical Equiv = "≡";
+
+//literales para los tipos primitivos
+lexical IntLiteral = [0-9]+ !>> [0-9];
+lexical BoolLiteral = "true" | "false";
+lexical CharLiteral = "\'" ![\'\n]* "\'";
+lexical StringLiteral = "\"" ![\"]* "\"";
 
 layout Layout = [\ \t\n\r]* !>> [\ \t\n\r];
 
@@ -24,9 +31,23 @@ syntax ModuleComponent
   | space:      Space
   ;
 
-syntax Space = defspace: "defspace" Identifier ("\<" Identifier)? "end";
+// Space ahora puede tener un tipo asociado dado por el usuario
+syntax Space 
+  = defspace: "defspace" Identifier spaceName "end"
+  | defspace: "defspace" Identifier spaceName "\<" Identifier superSpace "end"
+  | defspace: "defspace" Identifier spaceName ":" TypeAnnotation spaceType "end"
+  ;
 
-syntax VarDeclaration = varDecl: Identifier ":" Identifier;
+//anotacion de tipos para valores del programa
+syntax TypeAnnotation
+  = intType:    "Int"
+  | boolType:   "Bool"
+  | charType:   "Char"
+  | stringType: "String"
+  | userType:   Identifier
+  ;
+
+syntax VarDeclaration = varDecl: Identifier ":" TypeAnnotation;
 syntax Variable = defvar: "defvar" VarDeclaration ("," VarDeclaration)* "end";
 
 syntax AttributeElement
@@ -36,13 +57,19 @@ syntax AttributeElement
   ;
 syntax Attribute = attr: "[" AttributeElement ("," AttributeElement)* "]";
 
-syntax Type = typ: Identifier;
+
+syntax Type = typ: TypeAnnotation;
 syntax Operator = defoperator: "defoperator" Identifier ":" Type ("-\>" Type)+ Attribute? "end";
 
 syntax Expression = defexpression: "defexpression" LogicalExpression "end";
 
+//LogicalExpression ahora incluye literales de tipos primitivos
 syntax LogicalExpression
   = id:       Identifier
+  | intVal:   IntLiteral    
+  | boolVal:  BoolLiteral   
+  | charVal:  CharLiteral   
+  | strVal:   StringLiteral 
   | parens:   "(" LogicalExpression ")"
   | neg:      "neg" LogicalExpression
   > left inOp:     LogicalExpression "in"  LogicalExpression
@@ -78,7 +105,7 @@ syntax RelOp
   | rin: "in"
   ;
 
-syntax Rule = defrule: "defrule" OperatorApplication "-\>" OperatorApplication "end";
+syntax Rule = defrule: "defrule" OperatorApplication ruleLhs "-\>" OperatorApplication ruleRhs "end";
 
 syntax OperatorApplication
   = opApp: "(" Identifier RuleArgument* ")";
