@@ -32,13 +32,12 @@ fun MainWindow() {
     var result by remember { mutableStateOf<RunResult?>(null) }
     var running by remember { mutableStateOf(false) }
 
-    // ── Paleta ──────────────────────────────────────────────────
-    val bg          = Color(0xFF0D1117)   // fondo principal casi negro azulado
-    val navBar      = Color(0xFF161B22)   // barra superior
-    val surface     = Color(0xFF1C2333)   // paneles
-    val surfaceAlt  = Color(0xFF21262D)   // paneles secundarios
-    val border      = Color(0xFF30363D)   // bordes sutiles
-    val accent      = Color(0xFF58A6FF)   // azul acento (GitHub blue)
+    val bg          = Color(0xFF0D1117)
+    val navBar      = Color(0xFF161B22)
+    val surface     = Color(0xFF1C2333)
+    val surfaceAlt  = Color(0xFF21262D)
+    val border      = Color(0xFF30363D)
+    val accent      = Color(0xFF58A6FF)
     val green       = Color(0xFF3FB950)
     val red         = Color(0xFFF85149)
     val yellow      = Color(0xFFD29922)
@@ -47,10 +46,9 @@ fun MainWindow() {
     val textPrimary = Color(0xFFE6EDF3)
     val textMuted   = Color(0xFF8B949E)
 
-    Column(
-        modifier = Modifier.fillMaxSize().background(bg)
-    ) {
-        // ── Barra superior estilo──────────────────────────────────────
+    Column(modifier = Modifier.fillMaxSize().background(bg)) {
+
+        // ── Barra superior ─────────────────────────────────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -73,19 +71,17 @@ fun MainWindow() {
                         fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 }
                 Spacer(Modifier.height(2.dp))
-                Text("Elementos Esenciales de Lenguajes de Programación · ISIS-2111 · Uniandes",
+                Text("Elementos Esenciales de Lenguajes de Programacion · ISIS-2111 · Uniandes",
                     color = textMuted, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
             }
         }
 
-        // ── Contenido principal ────────────────────────────────────────────
+        // ── Contenido ──────────────────────────────────────────────────────
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
+            modifier = Modifier.fillMaxSize().padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // ── Panel de archivo ───────────────────────────────────────────
+            // Panel archivo
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -97,7 +93,6 @@ fun MainWindow() {
                     Text("ARCHIVO FUENTE", color = textMuted, fontSize = 10.sp,
                         fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
                         letterSpacing = 1.5.sp)
-
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -118,7 +113,6 @@ fun MainWindow() {
                                 unfocusedContainerColor = surfaceAlt
                             )
                         )
-
                         Button(
                             onClick = {
                                 val chooser = JFileChooser().apply {
@@ -131,9 +125,7 @@ fun MainWindow() {
                             colors = ButtonDefaults.buttonColors(containerColor = surfaceAlt),
                             border = ButtonDefaults.outlinedButtonBorder,
                             shape = RoundedCornerShape(6.dp)
-                        ) {
-                            Text("Buscar", color = textPrimary, fontSize = 13.sp)
-                        }
+                        ) { Text("Buscar", color = textPrimary, fontSize = 13.sp) }
 
                         Button(
                             onClick = {
@@ -148,8 +140,7 @@ fun MainWindow() {
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             if (running)
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
+                                CircularProgressIndicator(modifier = Modifier.size(16.dp),
                                     color = bg, strokeWidth = 2.dp)
                             else
                                 Text("Ejecutar", color = bg,
@@ -159,15 +150,13 @@ fun MainWindow() {
                 }
             }
 
-            // ── Panel de resultados ────────────────────────────────────────
+            // Panel resultados
             result?.let { r ->
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState()),
+                    modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    // Estado
+                    // Estado + módulo
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -180,14 +169,14 @@ fun MainWindow() {
                                 fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
                                 letterSpacing = 1.5.sp)
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                StatusChip("Parser",    r.parseOk,    green, red, bg)
-                                StatusChip("TypeCheck", r.typeCheckOk, green, yellow, bg)
-                                StatusChip("Semantica", r.semanticOk,  green, red, bg)
+                                StatusChip("Parser",    r.parseOk,     green, red)
+                                StatusChip("TypeCheck", r.typeCheckOk, green, yellow)
+                                StatusChip("Semantica", r.semanticOk,  green, red)
                             }
                             if (r.module.isNotBlank()) {
                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalAlignment = Alignment.CenterVertically) {
-                                    Text("módulo", color = textMuted,
+                                    Text("modulo", color = textMuted,
                                         fontSize = 12.sp, fontFamily = FontFamily.Monospace)
                                     Text(r.module, color = accent,
                                         fontSize = 13.sp, fontFamily = FontFamily.Monospace,
@@ -200,49 +189,39 @@ fun MainWindow() {
                     // Imports
                     if (r.moduleImports.isNotEmpty()) {
                         IdeSection(
-                            label = "IMPORTS",
+                            label = "MODULOS IMPORTADOS",
                             content = r.moduleImports.joinToString("\n") { "  using $it" },
-                            color = teal, bg = surface, border = border)
+                            color = teal, bg = surface, borderColor = border)
                     }
 
                     // Componentes
                     if (r.moduleComponents.isNotEmpty()) {
                         IdeSection(
-                            label = "COMPONENTES DEL MÓDULO  (${r.moduleComponents.size})",
+                            label = "COMPONENTES DEL MODULO  (${r.moduleComponents.size})",
                             content = r.moduleComponents.joinToString("\n") { "  $it" },
-                            color = purple, bg = surface, border = border)
+                            color = purple, bg = surface, borderColor = border)
                     }
 
-                    // Resumen
-                    if (r.resumen.isNotBlank()) {
-                        IdeSection(
-                            label = "RESUMEN AST",
-                            content = r.resumen,
-                            color = textMuted, bg = surface, border = border)
-                    }
-
-                    // Error
+                    // Error general — solo si hay error
                     if (r.error.isNotBlank()) {
-                        IdeSection(
-                            label = "ERROR",
-                            content = r.error,
-                            color = red, bg = surface, border = border)
+                        IdeSection(label = "ERROR", content = r.error,
+                            color = red, bg = surface, borderColor = border)
                     }
 
-                    // Type errors
+                    // Errores de tipos — solo si hay errores
                     if (r.typeErrors.isNotEmpty()) {
                         IdeSection(
                             label = "ERRORES DE TIPOS  (${r.typeErrors.size})",
                             content = r.typeErrors.joinToString("\n") { "  $it" },
-                            color = yellow, bg = surface, border = border)
+                            color = yellow, bg = surface, borderColor = border)
                     }
 
-                    // Semantic errors
+                    // Errores semanticos — solo si hay errores
                     if (r.semanticErrors.isNotEmpty()) {
                         IdeSection(
-                            label = "ERRORES SEMÁNTICOS  (${r.semanticErrors.size})",
+                            label = "ERRORES SEMANTICOS  (${r.semanticErrors.size})",
                             content = r.semanticErrors.joinToString("\n") { "  $it" },
-                            color = red, bg = surface, border = border)
+                            color = red, bg = surface, borderColor = border)
                     }
                 }
             }
@@ -251,7 +230,7 @@ fun MainWindow() {
 }
 
 @Composable
-private fun StatusChip(label: String, ok: Boolean, okColor: Color, failColor: Color, bg: Color) {
+private fun StatusChip(label: String, ok: Boolean, okColor: Color, failColor: Color) {
     val color = if (ok) okColor else failColor
     val icon  = if (ok) "✓" else "✗"
     Box(
@@ -270,12 +249,12 @@ private fun StatusChip(label: String, ok: Boolean, okColor: Color, failColor: Co
 }
 
 @Composable
-private fun IdeSection(label: String, content: String, color: Color, bg: Color, border: Color) {
+private fun IdeSection(label: String, content: String, color: Color, bg: Color, borderColor: Color) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(bg, RoundedCornerShape(8.dp))
-            .border(1.dp, border, RoundedCornerShape(8.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(8.dp))
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
