@@ -1,0 +1,5 @@
+target/
+*.jar
+*.pathconfig
+kotlin-app/.gradle/
+kotlin-app/build/
