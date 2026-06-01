@@ -38,8 +38,7 @@ AType resolveType((TypeAnnotation) `<Identifier typeName>`) = userDefinedType("<
 
 public TModel TModelFromTree(Tree pt) {
     if (pt has top) pt = pt.top;
-    TypePalConfig cfg = getModulesConfig();
-    col = newCollector("collectAndSolve", pt, cfg);
+    col = newCollector("collectAndSolve", pt, tconfig());
     collect(pt, col);
     return newSolver(pt, col.run()).run();
 }

@@ -1,0 +1,10 @@
+defmodule Set
+  using List
+
+  defspace Set < SuperSet end
+
+  defoperator union : Set -> Set -> Set end
+
+  defvar x : Element, S : Set end
+
+end
